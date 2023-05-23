@@ -1,3 +1,4 @@
 lightning_logs
 mlruns
 data/MNIST
+*__pycache__
