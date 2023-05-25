@@ -18,7 +18,9 @@ class Model(pl.LightningModule):
                                 nn.MaxPool2d(2,2))
         self.l2 = nn.Sequential(nn.Linear(in_features=48*4*4, out_features=256),
                                 nn.ReLU(inplace=True),
-                                nn.Linear(in_features=256, out_features=num_classes))
+                                nn.Linear(in_features=256, out_features=128),
+                                nn.ReLU(inplace=True),
+                                nn.Linear(in_features=128, out_features=num_classes))
         
     def forward(self, x):
         x = self.l1(x)
