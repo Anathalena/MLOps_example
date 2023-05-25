@@ -33,7 +33,6 @@ class Model(pl.LightningModule):
         x, y = train_batch
         out = self.forward(x)
         train_loss = self.loss(out,y)
-        self.train_accuracy(out,y)
         self.log("train_loss", train_loss, on_epoch=True, on_step=False)
         return train_loss
     
