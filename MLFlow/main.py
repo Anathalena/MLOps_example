@@ -17,7 +17,7 @@ if __name__ == '__main__':
             model = Model(num_classes=10, learning_rate=lr, batch_size=32)
             data = Data(batch_size=32)
 
-            mlflow.pytorch.log_model(model, registered_model_name="cnn-model")
+            mlflow.pytorch.log_model(model, "cnn-model")
             mlflow.log_param("learning_rate", lr)
 
             trainer = pl.Trainer(max_epochs=5)
