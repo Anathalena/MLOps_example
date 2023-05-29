@@ -11,9 +11,9 @@ if __name__ == '__main__':
 
     mlflow.set_experiment("Test")
     mlflow.pytorch.autolog()
-    mlflow.start_run(run_name="test_run_v2")
+    mlflow.start_run(run_name="test_run_v3")
 
-    model = Model(num_classes=10, learning_rate=1e-3, batch_size=32)
+    model = Model(num_classes=10, learning_rate=5e-3, batch_size=32)
     data = Data(batch_size=32)
 
     trainer = pl.Trainer(max_epochs=5)
