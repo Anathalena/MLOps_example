@@ -38,7 +38,7 @@ class Model(pl.LightningModule):
         x, y = batch
         out = self.forward(x)
         val_loss = self.loss(out,y)
-        y_pred = out.cpu()
+        y_pred = out.argmax(axis=1).cpu()
         acc = accuracy_score(y.cpu(),y_pred)
         mlflow.log_metric("val_acc", acc)
         mlflow.log_metric("val_loss", val_loss)
@@ -46,9 +46,9 @@ class Model(pl.LightningModule):
     def test_step(self, batch, batch_idx):
         x, y = batch
         out = self.forward(x)
-        y_pred = out.cpu()
+        y_pred = out.argmax(axis=1).cpu()
         acc = accuracy_score(y.cpu(),y_pred)
-        f1 = f1_score(y.cpu(),y_pred)
+        f1 = f1_score(y.cpu(),y_pred, average=None)
         mlflow.log_metric("test_acc", acc)
         mlflow.log_metric("f1_score", f1)
 
