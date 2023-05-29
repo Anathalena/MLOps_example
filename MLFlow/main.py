@@ -7,17 +7,23 @@ from dataloader import Data
 
 if __name__ == '__main__':
     remote_server_ui = 'http://127.0.0.1:5000'
+    run_name="MNIST classification - testing"
     mlflow.set_tracking_uri(remote_server_ui)
+    mlflow.set_experiment("Test with no auto log")
 
-    mlflow.set_experiment("Test")
-    mlflow.pytorch.autolog()
-    mlflow.start_run(run_name="test_run_v3")
+    for lr in [0.001, 0.005, 0.01, 0.1]:
+        with mlflow.start_run(run_name=run_name) as run:
+        
+            model = Model(num_classes=10, learning_rate=lr, batch_size=32)
+            data = Data(batch_size=32)
 
-    model = Model(num_classes=10, learning_rate=5e-3, batch_size=32)
-    data = Data(batch_size=32)
+            mlflow.pytorch.log_model(model, registered_model_name="cnn-model")
+            mlflow.log_param("learning_rate", lr)
 
-    trainer = pl.Trainer(max_epochs=5)
-    trainer.fit(model=model, datamodule=data)
-    trainer.validate(datamodule=data)
-    trainer.test(datamodule=data)
+            trainer = pl.Trainer(max_epochs=5)
+            trainer.fit(model=model, datamodule=data)
+            trainer.validate(datamodule=data)
+            trainer.test(datamodule=data)
+
+            print("Run with id {} and experiment id {} is done.".format(run.info.run_uuid, run.info.experiment_id))
     

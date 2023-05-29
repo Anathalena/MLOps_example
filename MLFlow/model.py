@@ -1,14 +1,12 @@
 import torch
 from torch import nn
 import lightning.pytorch as pl
-from torchmetrics import Accuracy
-
+from sklearn.metrics import accuracy_score, f1_score
+import mlflow
 
 class Model(pl.LightningModule):
     def __init__(self, num_classes, learning_rate, batch_size):
         super().__init__()
-        self.val_accuracy = Accuracy(task="multiclass", num_classes=num_classes)
-        self.test_accuracy = Accuracy(task="multiclass", num_classes=num_classes)
         self.lr = learning_rate
         self.batch_size = batch_size
         self.loss = nn.CrossEntropyLoss()
@@ -33,20 +31,22 @@ class Model(pl.LightningModule):
         x, y = train_batch
         out = self.forward(x)
         train_loss = self.loss(out,y)
-        self.log("train_loss", train_loss, on_epoch=True, on_step=False)
+        mlflow.log_metric("train_loss", train_loss)
         return train_loss
     
     def validation_step(self, batch, batch_idx):
         x, y = batch
         out = self.forward(x)
         val_loss = self.loss(out,y)
-        self.val_accuracy(out,y)
-        self.log("val_acc", self.val_accuracy, on_epoch=True, on_step=False)
-        self.log("val_loss", val_loss, on_epoch=True, on_step=False)
+        acc = accuracy_score(y,out)
+        mlflow.log_metric("val_acc", acc)
+        mlflow.log_metric("val_loss", val_loss)
 
     def test_step(self, batch, batch_idx):
         x, y = batch
         out = self.forward(x)
-        self.test_accuracy(out,y)
-        self.log("test_acc", self.test_accuracy, on_epoch=True, on_step=False)
+        acc = accuracy_score(y,out)
+        f1 = f1_score(y,out)
+        mlflow.log_metric("test_acc", acc)
+        mlflow.log_metric("f1_score", f1)
 
