@@ -33,7 +33,7 @@ class Model(pl.LightningModule):
         x, y = train_batch
         out = self.forward(x)
         train_loss = self.loss(out,y)
-        mlflow.log_metric("train_loss", train_loss)
+        self.log("train_loss", train_loss, on_epoch=True, on_step=False)
         return train_loss
     
     def validation_step(self, batch, batch_idx):
@@ -42,8 +42,8 @@ class Model(pl.LightningModule):
         val_loss = self.loss(out,y)
         y_pred = out.argmax(axis=1).cpu()
         acc = accuracy_score(y.cpu(),y_pred)
-        mlflow.log_metric("val_acc", acc)
-        mlflow.log_metric("val_loss", val_loss)
+        self.log("val_acc", acc, on_epoch=True, on_step=False)
+        self.log("val_loss", val_loss)
 
     def test_step(self, batch, batch_idx):
         x, y = batch
@@ -51,6 +51,6 @@ class Model(pl.LightningModule):
         y_pred = out.argmax(axis=1).cpu()
         acc = accuracy_score(y.cpu(),y_pred)
         f1 = f1_score(y.cpu(),y_pred, average=None)
-        mlflow.log_metric("test_acc", acc)
-        mlflow.log_metric("f1_score", f1)
+        self.log("test_acc", acc, on_epoch=True, on_step=False)
+        self.log("f1_score", f1, on_epoch=True, on_step=False)
 
