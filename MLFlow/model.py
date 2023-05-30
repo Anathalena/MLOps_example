@@ -1,7 +1,8 @@
 import torch
 from torch import nn
 import lightning.pytorch as pl
-from sklearn.metrics import accuracy_score, f1_score
+#from sklearn.metrics import accuracy_score, f1_score
+from torchmetrics import Accuracy, F1Score
 import mlflow
 
 class Model(pl.LightningModule):
@@ -9,6 +10,10 @@ class Model(pl.LightningModule):
         super().__init__()
         self.lr = learning_rate
         self.batch_size = batch_size
+        self.val_accuracy = Accuracy(task="multiclass", num_classes=num_classes)
+        self.test_accuracy = Accuracy(task="multiclass", num_classes=num_classes)
+        self.f1 = F1Score(task="multiclass", num_classes=num_classes, average='macro')
+
         self.loss = nn.CrossEntropyLoss()
         self.l1 = nn.Sequential(nn.Conv2d(in_channels=1, out_channels=24, kernel_size=5, stride=1, padding=0),
                                 nn.MaxPool2d(2,2),
@@ -40,17 +45,19 @@ class Model(pl.LightningModule):
         x, y = batch
         out = self.forward(x)
         val_loss = self.loss(out,y)
-        y_pred = out.argmax(axis=1).cpu()
-        acc = accuracy_score(y.cpu(),y_pred)
-        self.log("val_acc", acc, on_epoch=True, on_step=False)
+        #y_pred = out.argmax(axis=1).cpu()
+        #cc = accuracy_score(y.cpu(),y_pred)
+        self.val_accuracy(out,y)
+        self.log("val_acc", self.val_accuracy, on_epoch=True, on_step=False)
         self.log("val_loss", val_loss)
 
     def test_step(self, batch, batch_idx):
         x, y = batch
         out = self.forward(x)
-        y_pred = out.argmax(axis=1).cpu()
-        acc = accuracy_score(y.cpu(),y_pred)
-        f1 = f1_score(y.cpu(),y_pred, average='macro')
-        self.log("test_acc", acc, on_epoch=True, on_step=False)
-        self.log("f1_score", f1, on_epoch=True, on_step=False)
+        #y_pred = out.argmax(axis=1).cpu()
+        #acc = accuracy_score(y.cpu(),y_pred)
+        self.test_accuracy(out,y)
+        self.f1(out,y)
+        self.log("test_acc", self.test_accuracy, on_epoch=True, on_step=False)
+        self.log("f1_score", self.f1, on_epoch=True, on_step=False)
 

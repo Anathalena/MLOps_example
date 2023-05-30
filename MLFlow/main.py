@@ -11,12 +11,14 @@ if __name__ == '__main__':
     mlflow.set_experiment("Test with auto log")
     mlflow.pytorch.autolog(log_models=True)
 
-    mlflow.start_run(run_name="MNIST-classification-testing")
+    mlflow.start_run(run_name="MNIST-classification-testingv2.0")
 
-    model = Model(num_classes=10, learning_rate=1e-3, batch_size=32)
+    model = Model(num_classes=10, learning_rate=2e-3, batch_size=32)
     data = Data(batch_size=32)
 
-    trainer = pl.Trainer(max_epochs=50, callbacks=[EarlyStopping(monitor="val_loss", mode='min', patience=1)])
-    trainer.fit(model=model, train_dataloaders=data.train_dataloader(), val_dataloaders=data.val_dataloader())
-    trainer.test(ckpt_path='best', dataloaders=data.test_dataloader())
+    trainer = pl.Trainer(max_epochs=50, callbacks=[EarlyStopping(monitor="val_loss", mode='min', patience=5)])
+    trainer.fit(model, datamodule=data)
+    
+    data.setup(stage='test')
+    trainer.test(ckpt_path='best', datamodule=data)
     

@@ -15,8 +15,8 @@ class Data(pl.LightningDataModule):
         MNIST('./data', train=True, download=True)
 
     def setup(self, stage: str):
-        self.test_dataset = MNIST('./data', train=False, transform=self.transform)
-    
+        if stage=='test':
+            self.test_dataset = MNIST('./data', train=False, transform=self.transform)
         dataset = MNIST('./data', train=True, transform=self.transform)
         train_set_size = int(len(dataset)*0.8)
         val_set_size = len(dataset)-train_set_size
