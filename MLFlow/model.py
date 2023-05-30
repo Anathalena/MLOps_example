@@ -50,7 +50,7 @@ class Model(pl.LightningModule):
         out = self.forward(x)
         y_pred = out.argmax(axis=1).cpu()
         acc = accuracy_score(y.cpu(),y_pred)
-        f1 = f1_score(y.cpu(),y_pred, average=None)
+        f1 = f1_score(y.cpu(),y_pred, average='macro')
         self.log("test_acc", acc, on_epoch=True, on_step=False)
         self.log("f1_score", f1, on_epoch=True, on_step=False)
 
